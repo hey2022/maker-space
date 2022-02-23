@@ -8,7 +8,7 @@
 #endif
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
-void setup() {
+void setup() { 
   Serial.begin(9600);
   u8g2.begin();
   pinMode(3,OUTPUT);
@@ -25,19 +25,38 @@ int distance_calc() {
   return distance;
 }
 
-void check(int distance) {
-  if (distance > 45) {
-    Serial.println("Top up water");
+int check(int water_level) {
+  if (distance_calc() < 45 && water_level > 0) {
+    Serial.println("Water On");
+    while (distance_calc() < 45 && water_level > 0) {
+      --water_level;
+      Serial.println(water_level);
+      delay(50);
+    }
+    return water_level;
+  } else if (distance_calc() > 45 && water_level < 100) {
+    Serial.println("Toping up water");
+    while (distance_calc() > 45 && water_level < 100) {
+      ++water_level;
+      Serial.println(water_level);
+      delay(50);
+    }
+    return water_level;
+  } else if (water_level == 0) {
+    ++water_level;
+    return water_level;
   }
 }
 
 void loop() {
-  int distance = distance_calc();
-  check(distance);
-  char D[5] = {0};
-  sprintf(D, "%d", distance);
-  u8g2.clearBuffer();
-  u8g2.setFont(u8g2_font_ncenB08_tr);
-  u8g2.drawStr(0, 10, D);
-  u8g2.sendBuffer();
+  int water_level = 100;
+  while (true) {
+    water_level = check(water_level);
+    char D[5] = {0};
+    sprintf(D, "%d", distance_calc());
+    u8g2.clearBuffer();
+    u8g2.setFont(u8g2_font_ncenB08_tr);
+    u8g2.drawStr(0, 10, D);
+    u8g2.sendBuffer(); 
+  }
 }
