@@ -1,0 +1,28 @@
+#include <SPI.h>
+#include <MFRC522.h>
+
+MFRC522::MIFARE_Key key;
+
+void setup () {
+  Serial.begin(9600);
+  SPI.begin();
+  rfid.PCD_Init();
+  for (byte i = 0; i < 6; ++i) {
+    key.keyByte[i] = 0xff;
+  }
+}
+
+
+void () {
+  if (rfid.PICC_IsNewCardPresent()) {
+    if (rfid.PICC_ReadCardSerial()) {
+      String nuid;
+      for (byte i = 0; i < 4; i++) {
+        Nuid += rfid.uid.uidByte[i];
+      }
+      Serial.println(nuid);
+    }
+    rfid.PICC_HaltA();
+    rfid.PCD_StopCryptol();
+  }
+}
