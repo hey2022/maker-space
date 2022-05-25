@@ -12,10 +12,20 @@ void loop() {
   const int max_distance = 20;
   int time_1, time_2;
   bool flag_1 = false, flag_2 = false;
-  int left_distance, right_distance;
+  int left_distance, right_distance, prev_right = get_distance(8, 9), prev_left = get_distance(6, 7);
+  int difference = 100;
   while (true) {
     left_distance = get_distance(6, 7);
     right_distance = get_distance(8, 9);
+    if ((abs(left_distance - prev_left) > difference || abs(right_distance - prev_right) > difference) && left_distance > 0 && right_distance > 0 && prev_left > 0 && prev_right > 0) {
+      if (left_distance > prev_left || right_distance > prev_right) {
+        Serial.print("Further\n");
+      } else if (left_distance < prev_left || right_distance < prev_right) {
+        Serial.print("Closer\n");
+      }
+    }
+    prev_left = left_distance;
+    prev_right = right_distance;
     if (left_distance < max_distance && left_distance > 0 && flag_1 == false) {
       time_1 = millis();
       flag_1 = true;
